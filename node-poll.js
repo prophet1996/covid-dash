@@ -4,7 +4,6 @@ require('isomorphic-fetch');
 const redis = require("redis");
 const client = redis.createClient();
 
-
 client.on("connect", function() {
     console.log("Connected to Redis");
 });
@@ -15,8 +14,8 @@ client.on("error", function(error) {
 
 
 const rule = new schedule.RecurrenceRule();
-rule.minute= 5;
- 
+rule.second= 1;
+
 var j = schedule.scheduleJob(rule, async () =>{
     const response = fetch('https://api.covid19india.org/v4/min/data.min.json');
     const data = await (await response).json();
@@ -25,6 +24,11 @@ var j = schedule.scheduleJob(rule, async () =>{
         if (data[stateArray[i]]) {
             // console.log(`adding ${stateArray[i]} as ${JSON.stringify(data[stateArray[i]].total)}`);
             client.hmset(stateArray[i], data[stateArray[i]].total);
+            // client.hgetall(stateArray[i], (err, obj) => {
+            //     console.log('1', obj)
+            //  });
+            
+            
         }
     }
 });

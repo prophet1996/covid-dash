@@ -22,16 +22,14 @@ const state = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(500).send({ Error: 'Only get allowed' })
   const stateCode = req.query.id;
   res.statusCode = 200
-  const stateData = {};
-   await new Promise((res) => {
-    if(typeof stateCode === 'string')
-    STATE_DATA_KEYS.forEach((stateKey,i) => client.hmget(STATE_LOOKUP[stateCode],stateKey, (value) =>{
-      stateData[stateKey] = value;
-      if (i === STATE_DATA_KEYS.length-1) res(0);
-    }))
-     
+  const stateData =  await new Promise((res) => {
+     if (typeof stateCode === 'string')
+       client.hgetall(STATE_LOOKUP[stateCode], (err, stateData) => {
+         res(stateData);
+      })
   });
-  res.json({ stateData })
+  if (typeof stateCode === 'string')
+  res.json({ stateData,a:STATE_LOOKUP[stateCode]})
 
 }
 

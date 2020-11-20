@@ -70,7 +70,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const data = await getStateData(context?.params?.id);
   
   return {
-    props: {a:1 }, // will be passed to the page component as props
+    props: {data}, // will be passed to the page component as props
   }
 }
 
