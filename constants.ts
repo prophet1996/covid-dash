@@ -16,3 +16,5 @@ export const STATE_CODES = [
 export const StateLookup = {
     'DL':'Delhi'
 }
+
+export const stateDataKeys = ["confirmed","deceased","other","recovered","tested"]

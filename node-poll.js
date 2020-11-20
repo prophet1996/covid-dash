@@ -18,13 +18,22 @@ const rule = new schedule.RecurrenceRule();
 rule.second = 1;
  
 var j = schedule.scheduleJob(rule, async () =>{
-    console.log('The answer to life, the universe, and everything!');
     const response = fetch('https://api.covid19india.org/v4/min/data.min.json');
     const data = await (await response).json();
-    console.log('data:', data);
     const stateArray = Object.keys(data);
     for (let i = 0; i < stateArray.length; i++){
-        console.log(`adding ${stateArray[i]}`);
-        client.hmset(stateArray[i], data[stateArray[i]]);
+        if (data[stateArray[i]]) {
+            console.log(`adding ${stateArray[i]} as ${JSON.stringify(data[stateArray[i]].total)}`);
+            client.hmset(stateArray[i], data[stateArray[i]].total);
+        }
     }
 });
+
+
+/*
+stateDataKeys.forEach(key=>client.hmget(key, function(obj) {
+    console.log(obj);
+}));
+
+
+*/
