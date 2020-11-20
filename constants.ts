@@ -13,8 +13,8 @@ export const STATE_CODES = [
 ];
 
 
-export const StateLookup = {
+export const STATE_LOOKUP = {
     'DL':'Delhi'
 }
 
-export const stateDataKeys = ["confirmed","deceased","other","recovered","tested"]
+export const STATE_DATA_KEYS = ["confirmed","deceased","other","recovered","tested"]
