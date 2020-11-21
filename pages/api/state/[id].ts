@@ -1,11 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { NextApiRequest, NextApiResponse } from 'next';
-import fetch from 'isomorphic-fetch';
+import {  NextApiResponse } from 'next';
 import redis from "redis";
-import { BASE_API_URL,STATE_LOOKUP,STATE_CODES,STATE_DATA_KEYS } from '../../../constants';
+import nextConnect from 'next-connect';
+import middleware from '../../../middleware/database';
+import { NextApiRequestWithMongo } from '../../../types';
+
 
 const client = redis.createClient();
-
 
 client.on("connect", function() {
   console.log("Connected to Redis");
@@ -16,25 +17,33 @@ console.error(error);
 });
 
 
+const handler = nextConnect();
 
-const state = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'GET')
-  res.status(500).send({ Error: 'Only get allowed' })
+handler.use(middleware);
+
+
+
+handler.get(async (req: NextApiRequestWithMongo, res: NextApiResponse) => {
   const stateCode = req.query.id;
   res.statusCode = 200
-  const stateData =  await new Promise((res) => {
-     if (typeof stateCode === 'string')
-       client.hgetall(stateCode, (err, stateData) => {
-         res(stateData);
-      })
+  let stateData: any = {};
+  await new Promise((res, rej) => {
+    if (typeof stateCode === 'string') {
+      client.hgetall(stateCode, (err, stateTotal) => {
+        if (err) rej(err);
+        stateData.total = stateTotal;
+        res(stateData);
+      });
+    }
+    
   });
-  // if (typeof stateCode === 'string')  
-  // console.log("state:", stateData,stateCode);
+  stateData = await req.db.collection('state').findOne({name:stateCode})
   if (typeof stateCode === 'string')
-  res.json({ stateData,a:STATE_LOOKUP[stateCode]})
+    res.json({ stateData })
 
 }
+);
 
 // https://api.covid19india.org/v4/min/timeseries-MH.min.json
 
-export default state;
+export default handler;

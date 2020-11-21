@@ -3,6 +3,7 @@ import { BASE_API_URL } from '../../constants';
 import { GetServerSideProps } from 'next'
 import { getStateData } from '../../service';
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
+import Circle from '../../components/Chart';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -16,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
       alignItems: 'center',
       marginLeft: `240px`,
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('xs')]: {
         marginLeft: 0,
       },
     }
@@ -87,13 +88,26 @@ const useStyles = makeStyles((theme: Theme) =>
     }
     ,logo :{
       height: "1em",
+    },
+    titleHeading: {
+      display:" flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "baseline",
+      
+    },
+    titleStats: {
+      color: "red",
+      display: "flex",
+      flexDirection:"column"
     }
     
   })
 );
 
-const State = ({data,state=""}) => {
+const State = ({ data ,state=""}) => {
   const styles = useStyles();
+  const { stateData: { total: { confirmed = 0, deceased = 0, tested = 0, recovered = 0 } = {} } = {} } = data;
   
   return (
     <div className={styles.container}>
@@ -103,39 +117,25 @@ const State = ({data,state=""}) => {
       </Head>
 
       <main className={styles.main}>
+        <span className={styles.titleHeading}>
+        
+        
         <h2 className={styles.title}>
           {state.charAt(0).toUpperCase() + state.slice(1)}
-        </h2>
+          </h2>
+          <span className={styles.titleStats}>
+
+          {confirmed} {deceased}{tested}{recovered}
+          </span>
+        </span>
 
 
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+          <div className={styles.card}>
+          <Circle/> 
+          </div>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        
         </div>
       </main>
 
