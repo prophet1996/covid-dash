@@ -24,10 +24,12 @@ const state = async (req: NextApiRequest, res: NextApiResponse) => {
   res.statusCode = 200
   const stateData =  await new Promise((res) => {
      if (typeof stateCode === 'string')
-       client.hgetall(STATE_LOOKUP[stateCode], (err, stateData) => {
+       client.hgetall(stateCode, (err, stateData) => {
          res(stateData);
       })
   });
+  // if (typeof stateCode === 'string')  
+  // console.log("state:", stateData,stateCode);
   if (typeof stateCode === 'string')
   res.json({ stateData,a:STATE_LOOKUP[stateCode]})
 
