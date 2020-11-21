@@ -7,10 +7,7 @@ import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/sty
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      display: 'flex',
-      marginLeft: `calc( 100% - 240px )`,
-    },
+ 
     container: {
       minHeight: "100vh",
       padding: '0 0.5rem',
@@ -18,6 +15,10 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
+      marginLeft: `240px`,
+      [theme.breakpoints.down('sm')]: {
+        marginLeft: 0,
+      },
     }
     ,main: {
       padding: '5rem 0',
