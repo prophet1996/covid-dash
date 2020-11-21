@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme: Theme) =>
         marginLeft: drawerWidth,
       },
     },
-    menuButton: {
+      menuButton: {
+        color:"white",
       marginRight: theme.spacing(2),
       [theme.breakpoints.up('sm')]: {
         display: 'none',
