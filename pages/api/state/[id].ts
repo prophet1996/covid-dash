@@ -25,6 +25,7 @@ handler.use(middleware);
 
 handler.get(async (req: NextApiRequestWithMongo, res: NextApiResponse) => {
   const stateCode = req.query.id;
+  console.log(1,stateCode)
   res.statusCode = 200
   let stateData: any = {};
   await new Promise((res, rej) => {
@@ -37,9 +38,10 @@ handler.get(async (req: NextApiRequestWithMongo, res: NextApiResponse) => {
     }
     
   });
-  stateData = await req.db.collection('state').findOne({name:stateCode})
+  stateData = await req.db.collection('state').findOne({ name: stateCode })
+  const stateTimeseries = await req.db.collection('timeseries').findOne({name:stateCode})
   if (typeof stateCode === 'string')
-    res.json({ stateData })
+    res.json({ stateData ,stateTimeseries})
 
 }
 );

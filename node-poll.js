@@ -16,6 +16,11 @@ client.on("error", function (error) {
 const mongoClient = new MongoClient('mongodb://127.0.0.1:27017/?compressors=zlib&gssapiServiceName=mongodb', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+}, (err,client) => {
+        if (!err) {
+            client.createCollection('timeseries');
+            client.createCollection('state');
+        }
 });
 
 
@@ -27,19 +32,37 @@ const j = schedule.scheduleJob(rule, async () => {
     const data = await (await response).json();
     const stateArray = Object.keys(data);
     const mongoData = [];
-    for (let i = 0; i < stateArray.length; i++) {
-        if (data[stateArray[i]]) {
-            // console.log(`adding ${stateArray[i]} as ${JSON.stringify(data[stateArray[i]].total)}`);
-            client.hmset(stateArray[i], data[stateArray[i]].total);
-            client.hgetall(stateArray[i], (err, obj) => {
-                console.log('1', obj)
-            });
-            mongoData.push({ ...data[stateArray[i]], districts: undefined, name: stateArray[i] });
-        }
-    }
+    const mongoTimeSeriesData = [];
     if (!mongoClient.isConnected()) await mongoClient.connect();
     const db = mongoClient.db('MCT');
-    db.collection('state').insertMany(mongoData);
+    for (let i = 0; i < stateArray.length; i++) {
+        if (data[stateArray[i]]) {
+            client.hmset(stateArray[i], data[stateArray[i]].total);
+            // client.hgetall(stateArray[i], (err, obj) => {
+                // console.log('1', obj)
+            // });
+            mongoData.push({ ...data[stateArray[i]], districts: undefined, name: stateArray[i] });
+            //if() in redis cache dont add
+            {
+                try {
+                    const timeSeriesData = await (await fetch(`https://api.covid19india.org/v4/min/timeseries-${stateArray[i]}.min.json`)).json();
+                    // db.collection('timeseries').drop();
+                    mongoTimeSeriesData.push({ dates:timeSeriesData[stateArray[i]].dates,name:stateArray[i] });
+                        
+                } catch (err) {
+                    console.log(err);
+                }
+                
+             }
+        }
+    }
+    if (stateArray.length > 0) {
+        db.collection('state').drop();
+        db.collection('state').insertMany(mongoData);     
+        db.collection("timeseries").insertMany(mongoTimeSeriesData);
+        
+    }
+    
 
 });
 
